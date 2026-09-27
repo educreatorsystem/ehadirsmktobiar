@@ -224,16 +224,16 @@
                 <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-indigo-50/50">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800">Penandaan Kehadiran Kelas Tambahan</h2>
-                        <p class="text-xs text-slate-500 mt-1">Pilih subjek, tandakan murid yang tidak hadir, kemudian simpan rekod.</p>
+                        <p class="text-xs text-slate-500 mt-1">Pilih kelas dan subjek, tandakan murid yang tidak hadir, kemudian simpan rekod.</p>
                     </div>
                 </div>
                 
                 <div class="p-5 sm:p-6">
                     <div class="mb-5 rounded-lg border border-indigo-200 bg-indigo-50 p-4">
                         <h3 class="mb-2 text-sm font-bold text-indigo-900">Panduan Tanda Kehadiran Kelas Tambahan</h3>
-                        <p class="text-xs leading-5 text-indigo-800">Tarikh dan hari ditetapkan secara automatik. Pilih <strong>SUBJEK</strong> dahulu, kemudian tandakan status murid sebagai <strong>HADIR</strong> atau <strong>TH</strong>, dan akhir sekali tekan <strong>SIMPAN</strong>.</p>
+                        <p class="text-xs leading-5 text-indigo-800">Tarikh dan hari ditetapkan secara automatik. Pilih <strong>KELAS</strong> dan <strong>SUBJEK</strong>, kemudian tandakan <strong>HADIR</strong>, <strong>TH</strong>, atau <strong>TA</strong> bagi murid yang tidak mengambil subjek tersebut. Akhir sekali tekan <strong>SIMPAN</strong>. Murid berstatus TA tidak dikira dalam analisis kehadiran.</p>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                         <div class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
                             <span class="block text-xs font-bold uppercase text-slate-500">Tarikh & Hari</span>
                             <div id="additional-date-display" class="mt-1 font-bold text-slate-900">-</div>
@@ -241,18 +241,24 @@
                             <input type="hidden" id="date-tambahan">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Subjek</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Kelas</label>
                             <select id="class-tambahan" onchange="loadStudents('tambahan')" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">-- Sila Pilih Kelas --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Subjek</label>
+                            <select id="subject-tambahan" onchange="loadStudents('tambahan')" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">-- Sila Pilih Subjek --</option>
                             </select>
-                            <p class="mt-2 text-xs text-slate-500">Nama murid akan dipaparkan selepas subjek dipilih.</p>
+                            <p class="mt-2 text-xs text-slate-500">Nama murid dipaparkan selepas kelas dan subjek dipilih.</p>
                         </div>
                     </div>
 
                     <div id="container-tambahan" class="hidden">
                         <div class="flex justify-between items-end mb-3 pb-2 border-b border-slate-100">
                             <div class="flex items-center gap-2">
-                                <span class="text-sm font-semibold text-slate-600">Senarai Nama Murid Mengikut Subjek</span>
+                                <span class="text-sm font-semibold text-slate-600">Senarai Nama Murid Mengikut Kelas</span>
                                 <button onclick="toggleAllCheckboxes('tambahan', true)" class="text-xs text-red-600 hover:underline font-medium">Tanda Semua TH</button>
                                 <span class="text-slate-300">|</span>
                                 <button onclick="toggleAllCheckboxes('tambahan', false)" class="text-xs text-emerald-600 hover:underline font-medium">Reset Semua Hadir</button>
@@ -260,6 +266,7 @@
                             <div class="text-right">
                                 <div class="text-xs text-slate-500">Jumlah: <span id="total-tambahan" class="font-bold text-slate-800">0</span></div>
                                 <div class="text-xs text-red-500 font-medium">Ditanda TH: <span id="th-tambahan" class="font-bold text-red-600 text-sm">0</span></div>
+                                <div class="text-xs text-amber-600 font-medium">Tidak Ambil: <span id="ta-tambahan" class="font-bold text-amber-700 text-sm">0</span></div>
                             </div>
                         </div>
                         
@@ -411,7 +418,7 @@
         <!-- LAPORAN KELAS TAMBAHAN -->
         <div id="tab-laporan-tambahan" class="tab-content">
             <div class="flex flex-col gap-4 border-b border-slate-200 pb-5 mb-6 sm:flex-row sm:items-end sm:justify-between">
-                <div><h2 class="text-2xl font-bold text-slate-800">Laporan Kelas Tambahan</h2><p class="mt-1 text-sm text-slate-500">Analisis harian dan bulanan berdasarkan rekod kelas tambahan.</p></div>
+                <div><h2 class="text-2xl font-bold text-slate-800">Laporan Kelas Tambahan</h2><p class="mt-1 text-sm text-slate-500">Analisis harian dan bulanan mengikut subjek dan aliran tingkatan.</p></div>
                 <div class="inline-flex w-full sm:w-auto items-center gap-1 rounded-lg border border-slate-200 bg-slate-100 p-1" role="group" aria-label="Jenis laporan kelas tambahan">
                     <button id="extra-report-mode-harian" type="button" onclick="setExtraReportMode('harian')" aria-pressed="true" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm"><i data-lucide="calendar-days" class="h-4 w-4"></i> Laporan Harian</button>
                     <button id="extra-report-mode-bulanan" type="button" onclick="setExtraReportMode('bulanan')" aria-pressed="false" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-bold text-slate-600 hover:bg-white"><i data-lucide="calendar-range" class="h-4 w-4"></i> Laporan Bulanan</button>
@@ -434,8 +441,8 @@
                     <div class="rounded-lg border border-rose-200 bg-rose-50 p-4"><p class="text-xs font-bold uppercase text-rose-700">Bil. Tidak Hadir</p><p id="extra-daily-total-absent" class="mt-1 text-2xl font-extrabold text-rose-700">0</p></div>
                     <div class="rounded-lg border border-indigo-200 bg-indigo-50 p-4"><p class="text-xs font-bold uppercase text-indigo-700">Peratus Kehadiran</p><p id="extra-daily-attendance-rate" class="mt-1 text-2xl font-extrabold text-indigo-700">0%</p></div>
                 </div>
-                <div class="mb-7 overflow-hidden rounded-lg border border-slate-200 bg-white"><div class="border-b border-slate-200 px-4 py-3"><h3 class="text-sm font-bold uppercase text-slate-700">Jadual Analisis Mengikut Subjek</h3></div><div class="overflow-x-auto"><table class="w-full min-w-[720px] text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Bil</th><th class="px-4 py-3">Subjek</th><th class="px-4 py-3 text-center">Jumlah</th><th class="px-4 py-3 text-center">Hadir</th><th class="px-4 py-3 text-center">TH</th><th class="px-4 py-3 text-center">%</th><th class="px-4 py-3">Status</th></tr></thead><tbody id="extra-daily-class-analysis" class="divide-y divide-slate-100"></tbody></table></div></div>
-                <div><h3 class="mb-3 text-sm font-bold uppercase text-slate-700">Senarai Kehadiran Mengikut Subjek</h3><div id="extra-daily-absent-by-class" class="grid grid-cols-1 gap-3 md:grid-cols-2"></div></div>
+                <div class="mb-7 overflow-hidden rounded-lg border border-slate-200 bg-white"><div class="border-b border-slate-200 px-4 py-3"><h3 class="text-sm font-bold uppercase text-slate-700">Jadual Analisis Mengikut Subjek dan Tingkatan</h3></div><div class="overflow-x-auto"><table class="w-full min-w-[780px] text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Bil</th><th class="px-4 py-3">Tingkatan</th><th class="px-4 py-3">Subjek</th><th class="px-4 py-3 text-center">Jumlah</th><th class="px-4 py-3 text-center">Hadir</th><th class="px-4 py-3 text-center">TH</th><th class="px-4 py-3 text-center">%</th><th class="px-4 py-3">Status</th></tr></thead><tbody id="extra-daily-class-analysis" class="divide-y divide-slate-100"></tbody></table></div></div>
+                <div><h3 class="mb-3 text-sm font-bold uppercase text-slate-700">Senarai Kehadiran Mengikut Subjek dan Tingkatan</h3><div id="extra-daily-absent-by-class" class="grid grid-cols-1 gap-3 md:grid-cols-2"></div></div>
             </section>
 
             <section id="extra-report-view-bulanan" class="hidden">
@@ -443,8 +450,9 @@
                     <div class="flex flex-col gap-3 sm:flex-row"><div><label for="extra-report-month" class="mb-1 block text-xs font-bold uppercase text-slate-500">Bulan</label><select id="extra-report-month" onchange="renderExtraMonthlyReport()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"></select></div><div><label for="extra-report-year" class="mb-1 block text-xs font-bold uppercase text-slate-500">Tahun</label><select id="extra-report-year" onchange="renderExtraMonthlyReport()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"></select></div></div>
                     <div class="flex flex-wrap gap-2"><button type="button" onclick="renderExtraMonthlyReport()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"><i data-lucide="refresh-cw" class="h-4 w-4"></i> Jana Laporan</button><button type="button" onclick="printOfficialReport()" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button><button type="button" onclick="generateOfficialPdf()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"><i data-lucide="file-down" class="h-4 w-4"></i> Jana PDF</button></div>
                 </div>
-                <div class="mb-7 grid grid-cols-1 gap-3 sm:grid-cols-2"><div class="rounded-lg border border-indigo-200 bg-indigo-50 p-5"><p class="text-xs font-bold uppercase text-indigo-700">Kadar Kehadiran Keseluruhan</p><p id="extra-monthly-overall-rate" class="mt-2 text-3xl font-extrabold text-indigo-800">0%</p><p id="extra-monthly-record-summary" class="mt-1 text-xs text-indigo-700">Tiada rekod</p></div><div class="rounded-lg border border-emerald-200 bg-emerald-50 p-5"><p class="text-xs font-bold uppercase text-emerald-700">Subjek Terbaik Kehadiran</p><p id="extra-monthly-top-class" class="mt-2 text-2xl font-extrabold text-emerald-800">-</p><p id="extra-monthly-top-class-rate" class="mt-1 text-xs text-emerald-700">0% kehadiran</p></div></div>
-                <div class="overflow-hidden rounded-lg border border-slate-200 bg-white"><div class="border-b border-slate-200 px-4 py-3"><h3 class="text-sm font-bold uppercase text-slate-700">Senarai Nama Murid Berisiko</h3><p class="mt-1 text-xs text-slate-500">Murid tidak hadir kelas tambahan lebih daripada 3 hari dalam bulan dipilih.</p></div><div class="overflow-x-auto"><table class="w-full min-w-[560px] text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Bil</th><th class="px-4 py-3">Nama Murid</th><th class="px-4 py-3">Subjek</th><th class="px-4 py-3 text-center">Hari TH</th></tr></thead><tbody id="extra-monthly-risk-students" class="divide-y divide-slate-100"></tbody></table></div></div>
+                <div class="mb-7 grid grid-cols-1 gap-3 sm:grid-cols-2"><div class="rounded-lg border border-indigo-200 bg-indigo-50 p-5"><p class="text-xs font-bold uppercase text-indigo-700">Kadar Kehadiran Keseluruhan</p><p id="extra-monthly-overall-rate" class="mt-2 text-3xl font-extrabold text-indigo-800">0%</p><p id="extra-monthly-record-summary" class="mt-1 text-xs text-indigo-700">Tiada rekod</p></div><div class="rounded-lg border border-emerald-200 bg-emerald-50 p-5"><p class="text-xs font-bold uppercase text-emerald-700">Subjek dan Tingkatan Terbaik</p><p id="extra-monthly-top-class" class="mt-2 text-2xl font-extrabold text-emerald-800">-</p><p id="extra-monthly-top-class-rate" class="mt-1 text-xs text-emerald-700">0% kehadiran</p></div></div>
+                <div class="mb-7 overflow-hidden rounded-lg border border-slate-200 bg-white"><div class="border-b border-slate-200 px-4 py-3"><h3 class="text-sm font-bold uppercase text-slate-700">Analisis Bulanan Mengikut Subjek dan Tingkatan</h3></div><div class="overflow-x-auto"><table class="w-full min-w-[760px] text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Bil</th><th class="px-4 py-3">Tingkatan</th><th class="px-4 py-3">Subjek</th><th class="px-4 py-3 text-center">Peluang</th><th class="px-4 py-3 text-center">Hadir</th><th class="px-4 py-3 text-center">TH</th><th class="px-4 py-3 text-center">%</th></tr></thead><tbody id="extra-monthly-group-analysis" class="divide-y divide-slate-100"></tbody></table></div></div>
+                <div class="overflow-hidden rounded-lg border border-slate-200 bg-white"><div class="border-b border-slate-200 px-4 py-3"><h3 class="text-sm font-bold uppercase text-slate-700">Senarai Nama Murid Berisiko</h3><p class="mt-1 text-xs text-slate-500">Murid tidak hadir kelas tambahan lebih daripada 3 hari dalam bulan dipilih.</p></div><div class="overflow-x-auto"><table class="w-full min-w-[620px] text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Bil</th><th class="px-4 py-3">Nama Murid</th><th class="px-4 py-3">Tingkatan & Subjek</th><th class="px-4 py-3 text-center">Hari TH</th></tr></thead><tbody id="extra-monthly-risk-students" class="divide-y divide-slate-100"></tbody></table></div></div>
             </section>
         </div>
 
@@ -1059,7 +1067,9 @@
             return (records || []).map(r => ({
                 date: r.date || r.tarikh || "",
                 className: r.className || r.kelas || "",
-                absentStudentIds: (r.absentStudentIds || r.idsTH || []).map(String)
+                subject: r.subject || r.subjek || "",
+                absentStudentIds: (r.absentStudentIds || r.idsTH || []).map(String),
+                excludedStudentIds: (r.excludedStudentIds || r.idsTA || []).map(String)
             })).filter(r => r.date && r.className);
         }
 
@@ -1147,18 +1157,14 @@
                 rows = parseCsv(atob(ADDITIONAL_ROSTER_FALLBACK_BASE64)).slice(1);
             }
 
-            const students = rows.map(columns => {
-                const subject = String(columns[0] || "").trim();
-                const name = String(columns[1] || "").trim();
-                return { id: rosterStudentId(subject, name), subject, class: subject, name };
-            }).filter(student => student.subject && student.name);
-            if (!students.length) throw new Error("CSV kelas tambahan tidak mengandungi data SUBJEK dan NAMA MURID.");
+            const subjects = rows.map(columns => String(columns[0] || "").trim()).filter(Boolean);
+            if (!subjects.length) throw new Error("CSV kelas tambahan tidak mengandungi data SUBJEK.");
 
-            db.additionalStudents = students;
-            db.additionalSubjects = [...new Set(students.map(student => student.subject))];
+            db.additionalStudents = [];
+            db.additionalSubjects = [...new Set(subjects)];
             saveToLocalStorage();
             populateDropdowns();
-            return students.length;
+            return db.additionalSubjects.length;
         }
 
         function applyCloudData(data) {
@@ -1279,14 +1285,18 @@
 
         function prepareRecordsForCloud(records, type) {
             return records.map(record => {
-                const roster = type === "tambahan" ? db.additionalStudents : db.students;
-                const classStudents = roster.filter(student => student.class === record.className);
+                const classStudents = db.students.filter(student => student.class === record.className);
                 const absentIds = (record.absentStudentIds || []).map(String);
+                const excludedIds = (record.excludedStudentIds || []).map(String);
                 return {
                     ...record,
                     totalStudents: classStudents.length,
                     absentNames: classStudents
                         .filter(student => absentIds.includes(String(student.id)))
+                        .map(student => student.name),
+                    excludedStudentIds: excludedIds,
+                    excludedNames: classStudents
+                        .filter(student => excludedIds.includes(String(student.id)))
                         .map(student => student.name)
                 };
             });
@@ -1366,12 +1376,13 @@
         function populateDropdowns() {
             const harianSelect = document.getElementById("class-harian");
             const tambahanSelect = document.getElementById("class-tambahan");
+            const tambahanSubjectSelect = document.getElementById("subject-tambahan");
             const adminSelect = document.getElementById("new-student-class");
             const bulkSelect = document.getElementById("bulk-student-class");
             const filterHarian = document.getElementById("filter-ponteng-harian");
             const filterTambahan = document.getElementById("filter-ponteng-tambahan");
 
-            const selects = [harianSelect, adminSelect, bulkSelect];
+            const selects = [harianSelect, tambahanSelect, adminSelect, bulkSelect];
             selects.forEach(sel => {
                 if(!sel) return;
                 const currentVal = sel.value;
@@ -1382,13 +1393,13 @@
                 if(currentVal && db.classes.includes(currentVal)) sel.value = currentVal;
             });
 
-            if (tambahanSelect) {
-                const currentSubject = tambahanSelect.value;
-                tambahanSelect.innerHTML = `<option value="">-- Sila Pilih Subjek --</option>`;
+            if (tambahanSubjectSelect) {
+                const currentSubject = tambahanSubjectSelect.value;
+                tambahanSubjectSelect.innerHTML = `<option value="">-- Sila Pilih Subjek --</option>`;
                 db.additionalSubjects.forEach(subject => {
-                    tambahanSelect.innerHTML += `<option value="${subject}">${subject}</option>`;
+                    tambahanSubjectSelect.innerHTML += `<option value="${subject}">${subject}</option>`;
                 });
-                if (currentSubject && db.additionalSubjects.includes(currentSubject)) tambahanSelect.value = currentSubject;
+                if (currentSubject && db.additionalSubjects.includes(currentSubject)) tambahanSubjectSelect.value = currentSubject;
             }
 
             [filterHarian, filterTambahan].forEach(sel => {
@@ -1402,11 +1413,12 @@
 
         function loadStudents(type) {
             const className = document.getElementById(`class-${type}`).value;
+            const subject = type === "tambahan" ? document.getElementById("subject-tambahan").value : "";
             const container = document.getElementById(`container-${type}`);
             const listEl = document.getElementById(`list-${type}`);
             const dateVal = document.getElementById(`date-${type}`).value;
 
-            if (!className) {
+            if (!className || (type === "tambahan" && !subject)) {
                 container.classList.add("hidden");
                 return;
             }
@@ -1414,34 +1426,37 @@
             container.classList.remove("hidden");
             listEl.innerHTML = "";
 
-            const roster = type === "tambahan" ? db.additionalStudents : db.students;
-            const classStudents = roster.filter(s => s.class === className);
+            const classStudents = db.students.filter(s => s.class === className);
             document.getElementById(`total-${type}`).textContent = classStudents.length;
 
             if (classStudents.length === 0) {
-                listEl.innerHTML = `<div class="p-4 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">Tiada murid berdaftar untuk ${type === "tambahan" ? "subjek" : "kelas"} ini.</div>`;
+                listEl.innerHTML = `<div class="p-4 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">Tiada murid berdaftar untuk kelas ini.</div>`;
                 updateTHCount(type);
                 return;
             }
 
             // Find existing record for this date & class
             const recordsList = type === 'harian' ? db.recordsHarian : db.recordsTambahan;
-            const existingRecord = recordsList.find(r => r.date === dateVal && r.className === className);
+            const existingRecord = recordsList.find(r => r.date === dateVal && r.className === className && (type !== "tambahan" || r.subject === subject));
             const absentIds = existingRecord ? existingRecord.absentStudentIds.map(String) : [];
+            const excludedIds = existingRecord ? (existingRecord.excludedStudentIds || []).map(String) : [];
 
             classStudents.forEach(st => {
                 const studentId = String(st.id);
                 const isAbsent = absentIds.includes(studentId);
+                const isExcluded = type === "tambahan" && excludedIds.includes(studentId);
                 const itemHtml = `
-                    <label class="relative flex items-center p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition-all select-none">
-                        <input type="checkbox" value="${studentId}" class="checkbox-th sr-only" ${isAbsent ? 'checked' : ''} onchange="updateTHCount('${type}')">
-                        <div class="flex items-center justify-between w-full p-1 rounded-lg transition-colors">
+                    <div class="student-row relative flex items-center p-3 rounded-xl border border-slate-200 bg-white transition-all select-none" data-status="${isExcluded ? 'TA' : isAbsent ? 'TH' : 'HADIR'}">
+                        <input type="checkbox" value="${studentId}" class="checkbox-th sr-only" ${isAbsent ? 'checked' : ''} onchange="setStudentTH(this, '${type}')">
+                        <div class="flex items-center justify-between gap-3 w-full p-1 rounded-lg transition-colors">
                             <span class="text-xs font-semibold text-slate-800">${st.name}</span>
-                            <span class="status-badge text-[10px] font-bold px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 transition-colors">
-                                HADIR
-                            </span>
+                            <div class="flex shrink-0 items-center gap-1.5">
+                                <button type="button" onclick="setStudentStatus(this, 'HADIR', '${type}')" class="status-hadir text-[10px] font-bold px-2.5 py-1.5 rounded-md border transition-colors">HADIR</button>
+                                <button type="button" onclick="setStudentStatus(this, 'TH', '${type}')" class="status-th text-[10px] font-bold px-2.5 py-1.5 rounded-md border transition-colors">TH</button>
+                                ${type === "tambahan" ? `<button type="button" onclick="setStudentStatus(this, 'TA', '${type}')" class="status-ta text-[10px] font-bold px-2.5 py-1.5 rounded-md border transition-colors" title="Tidak Ambil subjek ini">TA</button>` : ""}
+                            </div>
                         </div>
-                    </label>
+                    </div>
                 `;
                 listEl.innerHTML += itemHtml;
             });
@@ -1451,24 +1466,46 @@
         }
 
         function updateTHCount(type) {
-            const checkedCount = document.querySelectorAll(`#list-${type} input[type="checkbox"]:checked`).length;
+            const rows = document.querySelectorAll(`#list-${type} .student-row`);
+            const checkedCount = Array.from(rows).filter(row => row.dataset.status === "TH").length;
+            const excludedCount = Array.from(rows).filter(row => row.dataset.status === "TA").length;
             document.getElementById(`th-${type}`).textContent = checkedCount;
+            if (type === "tambahan") document.getElementById("ta-tambahan").textContent = excludedCount;
 
-            // Update badges label dynamically
-            document.querySelectorAll(`#list-${type} label`).forEach(label => {
-                const cb = label.querySelector('input[type="checkbox"]');
-                const badge = label.querySelector('.status-badge');
-                if (cb.checked) {
-                    badge.textContent = "TIDAK HADIR (TH)";
-                } else {
-                    badge.textContent = "HADIR";
+            rows.forEach(row => {
+                const status = row.dataset.status || "HADIR";
+                row.querySelector(".checkbox-th").checked = status === "TH";
+                const styles = {
+                    HADIR: ["bg-emerald-600", "text-white", "border-emerald-600"],
+                    TH: ["bg-rose-600", "text-white", "border-rose-600"],
+                    TA: ["bg-amber-500", "text-white", "border-amber-500"]
+                };
+                row.querySelectorAll("button[class*='status-']").forEach(button => {
+                    button.classList.remove("bg-emerald-600", "bg-rose-600", "bg-amber-500", "text-white", "border-emerald-600", "border-rose-600", "border-amber-500");
+                    button.classList.add("bg-white", "text-slate-600", "border-slate-200");
+                });
+                const active = row.querySelector(`.status-${status.toLowerCase()}`);
+                if (active) {
+                    active.classList.remove("bg-white", "text-slate-600", "border-slate-200");
+                    active.classList.add(...styles[status]);
                 }
             });
         }
 
+        function setStudentStatus(button, status, type) {
+            const row = button.closest(".student-row");
+            row.dataset.status = status;
+            updateTHCount(type);
+        }
+
+        function setStudentTH(checkbox, type) {
+            checkbox.closest(".student-row").dataset.status = checkbox.checked ? "TH" : "HADIR";
+            updateTHCount(type);
+        }
+
         function toggleAllCheckboxes(type, state) {
-            document.querySelectorAll(`#list-${type} input[type="checkbox"]`).forEach(cb => {
-                cb.checked = state;
+            document.querySelectorAll(`#list-${type} .student-row`).forEach(row => {
+                row.dataset.status = state ? "TH" : "HADIR";
             });
             updateTHCount(type);
         }
@@ -1476,32 +1513,37 @@
         async function submitAttendance(type) {
             const dateVal = document.getElementById(`date-${type}`).value;
             const className = document.getElementById(`class-${type}`).value;
+            const subject = type === "tambahan" ? document.getElementById("subject-tambahan").value : "";
 
-            if (!className) {
-                Swal.fire('Perhatian', `Sila pilih ${type === "tambahan" ? "subjek" : "kelas"} terlebih dahulu.`, 'warning');
+            if (!className || (type === "tambahan" && !subject)) {
+                Swal.fire('Perhatian', type === "tambahan" ? 'Sila pilih kelas dan subjek terlebih dahulu.' : 'Sila pilih kelas terlebih dahulu.', 'warning');
                 return;
             }
 
             const absentStudentIds = Array.from(
-                document.querySelectorAll(`#list-${type} input[type="checkbox"]:checked`)
+                document.querySelectorAll(`#list-${type} .student-row[data-status="TH"] .checkbox-th`)
             ).map(cb => String(cb.value));
+            const excludedStudentIds = type === "tambahan" ? Array.from(
+                document.querySelectorAll(`#list-${type} .student-row[data-status="TA"] .checkbox-th`)
+            ).map(cb => String(cb.value)) : [];
 
             const recordsList = type === 'harian' ? db.recordsHarian : db.recordsTambahan;
-            const existingIdx = recordsList.findIndex(r => r.date === dateVal && r.className === className);
+            const existingIdx = recordsList.findIndex(r => r.date === dateVal && r.className === className && (type !== "tambahan" || r.subject === subject));
 
             if (existingIdx >= 0) {
                 recordsList[existingIdx].absentStudentIds = absentStudentIds;
+                recordsList[existingIdx].excludedStudentIds = excludedStudentIds;
             } else {
-                recordsList.push({ date: dateVal, className, absentStudentIds });
+                recordsList.push({ date: dateVal, className, subject, absentStudentIds, excludedStudentIds });
             }
 
             saveToLocalStorage();
             renderClassSubmissionStatus();
 
             // Prepare payload for Google Sheets Sync
-            const roster = type === "tambahan" ? db.additionalStudents : db.students;
-            const classStudents = roster.filter(s => s.class === className);
+            const classStudents = db.students.filter(s => s.class === className);
             const absentNames = classStudents.filter(s => absentStudentIds.includes(s.id)).map(s => s.name);
+            const excludedNames = classStudents.filter(s => excludedStudentIds.includes(s.id)).map(s => s.name);
 
             Swal.fire({
                 title: 'Menyimpan Kehadiran...',
@@ -1515,11 +1557,14 @@
                 type: type,
                 date: dateVal,
                 className: className,
+                subject: subject,
                 totalStudents: classStudents.length,
-                presentCount: classStudents.length - absentStudentIds.length,
+                presentCount: classStudents.length - absentStudentIds.length - excludedStudentIds.length,
                 absentCount: absentStudentIds.length,
                 absentNames: absentNames,
-                absentStudentIds: absentStudentIds
+                absentStudentIds: absentStudentIds,
+                excludedNames: excludedNames,
+                excludedStudentIds: excludedStudentIds
             };
 
             const res = await postToGoogleSheets(payload);
@@ -1527,7 +1572,7 @@
             if (res.success) {
                 Swal.close();
                 setTimeout(() => fetchFromCloud({ silent: true }).catch(() => null), 1500);
-                showNotepadModal(type, className, dateVal, classStudents.length, absentNames);
+                showNotepadModal(type, className, dateVal, classStudents.length, absentNames, subject);
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -1540,30 +1585,17 @@
 
         let currentNotepadText = "";
 
-        function showNotepadModal(type, className, dateVal, totalStudents, absentStudentNames) {
-            // Format tarikh ke bentuk DD/MM/YYYY
-            let formattedDate = dateVal;
-            if (dateVal && dateVal.includes('-')) {
-                const parts = dateVal.split('-');
-                if (parts.length === 3) {
-                    formattedDate = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`;
-                }
-            }
+        function showNotepadModal(type, className, dateVal, totalStudents, absentStudentNames, subject = "") {
+            const reportDate = new Date(`${dateVal}T00:00:00`);
+            const formattedDate = reportDate.toLocaleDateString("ms-MY", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
             const absentCount = absentStudentNames.length;
-            const presentCount = totalStudents - absentCount;
-            const rate = totalStudents > 0 ? ((presentCount / totalStudents) * 100).toFixed(2) : "0.00";
-
-            let absentListText = "";
-            if (absentCount === 0) {
-                absentListText = "Tiada (Hadir Semua)";
-            } else {
-                absentListText = absentStudentNames.map((name, i) => `${i + 1}. ${name}`).join('\n');
-            }
-
-            const groupLabel = type === 'tambahan' ? 'SUBJEK' : 'KELAS';
-
-            currentNotepadText = `KEHADIRAN KELAS ${type === 'tambahan' ? 'TAMBAHAN' : 'HARIAN'}\n${groupLabel} : ${className.toUpperCase()}\nTARIKH : ${formattedDate}\n\nENROLMEN : ${totalStudents}\nBIL HADIR : ${presentCount}\nBIL TH : ${absentCount}\n% KEHADIRAN : ${rate}%\n\nSENARAI NAMA TIDAK HADIR:\n${absentListText}`;
+            const absentListText = absentCount
+                ? absentStudentNames.map((name, i) => `${i + 1}. ${name}`).join('\n')
+                : "Tiada - semua pelajar hadir";
+            const divider = "━━━━━━━━━━━━━━━━━━━━━━";
+            const subjectLine = type === "tambahan" ? `\nSubjek: ${subject}` : "";
+            currentNotepadText = `SENARAI PELAJAR TIDAK HADIR (TH)\nKelas: ${className}${subjectLine}\nTarikh: ${formattedDate}\n${divider}\n\n${absentListText}\n\n${divider}\nJumlah: ${absentCount} pelajar tidak hadir`;
 
             document.getElementById("notepad-content").textContent = currentNotepadText;
             document.getElementById("notepad-modal").classList.remove("hidden");
@@ -1641,7 +1673,7 @@
             const submittedClasses = new Set(
                 records
                     .filter(r => r.date === targetDate)
-                    .map(r => r.className)
+                    .map(r => statusAttendanceType === "tambahan" ? r.subject : r.className)
             );
 
             const sudahClasses = [];
@@ -1847,34 +1879,53 @@
             }).join("");
         }
 
+        function getFormLevel(className) {
+            const match = String(className || "").trim().match(/^(\d+)/);
+            return match ? match[1] : "Lain-lain";
+        }
+
+        function getAdditionalReportGroups() {
+            const forms = [...new Set(db.classes.map(getFormLevel).filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, "ms", { numeric: true }));
+            return forms.flatMap(form => db.additionalSubjects.map(subject => ({
+                form,
+                subject,
+                label: `Tingkatan ${form} — ${subject}`
+            })));
+        }
+
         function renderExtraDailyReport() {
             const date = document.getElementById("extra-report-daily-date")?.value || localDateValue();
             let recordedStudents = 0;
             let totalPresent = 0;
             let totalAbsent = 0;
-            const analyses = db.additionalSubjects.map(className => {
-                const students = db.additionalStudents.filter(student => student.class === className);
-                const record = db.recordsTambahan.find(item => item.date === date && item.className === className);
-                const absentIds = record ? record.absentStudentIds.map(String) : [];
-                const absent = record ? absentIds.length : 0;
-                const present = record ? Math.max(students.length - absent, 0) : 0;
-                const rate = record && students.length ? (present / students.length) * 100 : null;
-                if (record) { recordedStudents += students.length; totalPresent += present; totalAbsent += absent; }
-                return { className, students, record, absentIds, absent, present, rate };
+            const analyses = getAdditionalReportGroups().map(group => {
+                const records = db.recordsTambahan.filter(item => item.date === date && item.subject === group.subject && getFormLevel(item.className) === group.form);
+                const totalRoster = records.reduce((sum, record) => sum + db.students.filter(student => student.class === record.className).length, 0);
+                const excluded = records.reduce((sum, record) => sum + (record.excludedStudentIds || []).length, 0);
+                const total = Math.max(totalRoster - excluded, 0);
+                const absent = records.reduce((sum, record) => sum + record.absentStudentIds.length, 0);
+                const present = Math.max(total - absent, 0);
+                const rate = records.length && total ? (present / total) * 100 : null;
+                const absentStudents = records.flatMap(record => {
+                    const ids = record.absentStudentIds.map(String);
+                    return db.students.filter(student => student.class === record.className && ids.includes(String(student.id))).map(student => ({ ...student, recordClass: record.className }));
+                });
+                if (records.length) { recordedStudents += total; totalPresent += present; totalAbsent += absent; }
+                return { ...group, records, total, absentStudents, absent, present, rate };
             });
             const overallRate = recordedStudents ? (totalPresent / recordedStudents) * 100 : 0;
-            document.getElementById("extra-daily-total-students").textContent = db.additionalStudents.length;
+            document.getElementById("extra-daily-total-students").textContent = recordedStudents;
             document.getElementById("extra-daily-total-present").textContent = totalPresent;
             document.getElementById("extra-daily-total-absent").textContent = totalAbsent;
             document.getElementById("extra-daily-attendance-rate").textContent = `${overallRate.toFixed(1)}%`;
             document.getElementById("extra-daily-class-analysis").innerHTML = analyses.map((item, index) => {
                 const status = item.rate == null ? { label: "Belum Hantar", classes: "bg-slate-50 text-slate-600 border-slate-200" } : reportStatus(item.rate);
-                return `<tr class="text-slate-700"><td class="px-4 py-3">${index + 1}</td><td class="px-4 py-3 font-bold text-slate-900">${escapeReportText(item.className)}</td><td class="px-4 py-3 text-center">${item.students.length}</td><td class="px-4 py-3 text-center">${item.record ? item.present : "-"}</td><td class="px-4 py-3 text-center">${item.record ? item.absent : "-"}</td><td class="px-4 py-3 text-center font-bold">${item.rate == null ? "-" : `${item.rate.toFixed(1)}%`}</td><td class="px-4 py-3"><span class="inline-flex rounded border px-2 py-1 text-[11px] font-bold ${status.classes}">${status.label}</span></td></tr>`;
-            }).join("") || `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">Tiada subjek dalam roster.</td></tr>`;
+                return `<tr class="text-slate-700"><td class="px-4 py-3">${index + 1}</td><td class="px-4 py-3 font-bold text-slate-900">Tingkatan ${escapeReportText(item.form)}</td><td class="px-4 py-3 font-semibold text-slate-800">${escapeReportText(item.subject)}</td><td class="px-4 py-3 text-center">${item.total}</td><td class="px-4 py-3 text-center">${item.records.length ? item.present : "-"}</td><td class="px-4 py-3 text-center">${item.records.length ? item.absent : "-"}</td><td class="px-4 py-3 text-center font-bold">${item.rate == null ? "-" : `${item.rate.toFixed(1)}%`}</td><td class="px-4 py-3"><span class="inline-flex rounded border px-2 py-1 text-[11px] font-bold ${status.classes}">${status.label}</span></td></tr>`;
+            }).join("") || `<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">Tiada subjek atau tingkatan dalam roster.</td></tr>`;
             document.getElementById("extra-daily-absent-by-class").innerHTML = analyses.map(item => {
-                const absentStudents = item.students.filter(student => item.absentIds.includes(String(student.id)));
-                const content = !item.record ? `<p class="text-xs font-semibold text-slate-400">Rekod belum dihantar.</p>` : absentStudents.length ? `<ol class="space-y-1 text-xs text-slate-700">${absentStudents.map((student, index) => `<li>${index + 1}. ${escapeReportText(student.name)}</li>`).join("")}</ol>` : `<p class="text-xs font-semibold text-emerald-700">Semua murid hadir.</p>`;
-                return `<div class="rounded-lg border border-slate-200 bg-white p-4"><div class="mb-3 flex items-center justify-between"><h4 class="font-bold text-slate-900">${escapeReportText(item.className)}</h4><span class="text-xs font-bold text-rose-600">${item.record ? `${item.absent} TH` : "Belum Hantar"}</span></div>${content}</div>`;
+                const content = !item.records.length ? `<p class="text-xs font-semibold text-slate-400">Rekod belum dihantar.</p>` : item.absentStudents.length ? `<ol class="space-y-1 text-xs text-slate-700">${item.absentStudents.map((student, index) => `<li>${index + 1}. ${escapeReportText(student.name)} (${escapeReportText(student.recordClass)})</li>`).join("")}</ol>` : `<p class="text-xs font-semibold text-emerald-700">Semua murid hadir.</p>`;
+                return `<div class="rounded-lg border border-slate-200 bg-white p-4"><div class="mb-3 flex items-center justify-between gap-3"><div><p class="text-[11px] font-bold uppercase text-indigo-600">Tingkatan ${escapeReportText(item.form)}</p><h4 class="font-bold text-slate-900">${escapeReportText(item.subject)}</h4></div><span class="text-xs font-bold text-rose-600">${item.records.length ? `${item.absent} TH` : "Belum Hantar"}</span></div>${content}</div>`;
             }).join("");
         }
 
@@ -1894,7 +1945,8 @@
             records.forEach(record => {
                 const students = db.students.filter(student => student.class === record.className);
                 const absentIds = record.absentStudentIds.map(String);
-                totalOpportunities += students.length;
+                const excludedIds = (record.excludedStudentIds || []).map(String);
+                totalOpportunities += Math.max(students.length - excludedIds.length, 0);
                 totalAbsent += absentIds.length;
                 if (!classStats[record.className]) classStats[record.className] = { total: 0, absent: 0 };
                 classStats[record.className].total += students.length;
@@ -1938,24 +1990,45 @@
             const classStats = {};
             const riskDays = {};
             records.forEach(record => {
-                const students = db.additionalStudents.filter(student => student.class === record.className);
+                const students = db.students.filter(student => student.class === record.className);
                 const absentIds = record.absentStudentIds.map(String);
-                totalOpportunities += students.length;
+                const excludedIds = (record.excludedStudentIds || []).map(String);
+                const eligible = Math.max(students.length - excludedIds.length, 0);
+                totalOpportunities += eligible;
                 totalAbsent += absentIds.length;
-                if (!classStats[record.className]) classStats[record.className] = { total: 0, absent: 0 };
-                classStats[record.className].total += students.length;
-                classStats[record.className].absent += absentIds.length;
-                absentIds.forEach(id => { if (!riskDays[id]) riskDays[id] = new Set(); riskDays[id].add(record.date); });
+                const subject = record.subject || "Subjek Tidak Dinyatakan";
+                const form = getFormLevel(record.className);
+                const groupKey = `${form}\u001f${subject}`;
+                if (!classStats[groupKey]) classStats[groupKey] = { total: 0, absent: 0, form, subject };
+                classStats[groupKey].total += eligible;
+                classStats[groupKey].absent += absentIds.length;
+                absentIds.forEach(id => {
+                    const riskKey = `${id}\u001f${form}\u001f${subject}`;
+                    if (!riskDays[riskKey]) riskDays[riskKey] = new Set();
+                    riskDays[riskKey].add(record.date);
+                });
             });
             const overallRate = totalOpportunities ? ((totalOpportunities - totalAbsent) / totalOpportunities) * 100 : 0;
             document.getElementById("extra-monthly-overall-rate").textContent = `${overallRate.toFixed(1)}%`;
-            document.getElementById("extra-monthly-record-summary").textContent = records.length ? `${records.length} rekod subjek dianalisis` : "Tiada rekod untuk bulan ini";
-            const rankedClasses = Object.entries(classStats).map(([className, stats]) => ({ className, rate: stats.total ? ((stats.total - stats.absent) / stats.total) * 100 : 0 })).sort((a, b) => b.rate - a.rate || a.className.localeCompare(b.className));
+            document.getElementById("extra-monthly-record-summary").textContent = records.length ? `${records.length} rekod subjek mengikut tingkatan dianalisis` : "Tiada rekod untuk bulan ini";
+            const rankedClasses = Object.values(classStats).map(stats => ({
+                className: `Tingkatan ${stats.form} — ${stats.subject}`,
+                rate: stats.total ? ((stats.total - stats.absent) / stats.total) * 100 : 0
+            })).sort((a, b) => b.rate - a.rate || a.className.localeCompare(b.className));
             const topClass = rankedClasses[0];
             document.getElementById("extra-monthly-top-class").textContent = topClass ? topClass.className : "-";
             document.getElementById("extra-monthly-top-class-rate").textContent = topClass ? `${topClass.rate.toFixed(1)}% kehadiran` : "0% kehadiran";
-            const riskStudents = Object.entries(riskDays).map(([id, dates]) => ({ student: db.additionalStudents.find(item => String(item.id) === id), days: dates.size })).filter(item => item.student && item.days > 3).sort((a, b) => b.days - a.days || a.student.name.localeCompare(b.student.name));
-            document.getElementById("extra-monthly-risk-students").innerHTML = riskStudents.length ? riskStudents.map((item, index) => `<tr><td class="px-4 py-3">${index + 1}</td><td class="px-4 py-3 font-semibold text-slate-900">${escapeReportText(item.student.name)}</td><td class="px-4 py-3">${escapeReportText(item.student.class)}</td><td class="px-4 py-3 text-center font-bold text-rose-600">${item.days}</td></tr>`).join("") : `<tr><td colspan="4" class="px-4 py-8 text-center text-slate-400">Tiada murid melebihi 3 hari tidak hadir kelas tambahan.</td></tr>`;
+            document.getElementById("extra-monthly-group-analysis").innerHTML = getAdditionalReportGroups().map((group, index) => {
+                const stats = classStats[`${group.form}\u001f${group.subject}`];
+                const present = stats ? Math.max(stats.total - stats.absent, 0) : 0;
+                const rate = stats && stats.total ? (present / stats.total) * 100 : null;
+                return `<tr><td class="px-4 py-3">${index + 1}</td><td class="px-4 py-3 font-bold text-slate-900">Tingkatan ${escapeReportText(group.form)}</td><td class="px-4 py-3 font-semibold text-slate-800">${escapeReportText(group.subject)}</td><td class="px-4 py-3 text-center">${stats ? stats.total : "-"}</td><td class="px-4 py-3 text-center">${stats ? present : "-"}</td><td class="px-4 py-3 text-center">${stats ? stats.absent : "-"}</td><td class="px-4 py-3 text-center font-bold">${rate == null ? "-" : `${rate.toFixed(1)}%`}</td></tr>`;
+            }).join("") || `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">Tiada subjek atau tingkatan dalam roster.</td></tr>`;
+            const riskStudents = Object.entries(riskDays).map(([key, dates]) => {
+                const [id, form, subject] = key.split("\u001f");
+                return { student: db.students.find(item => String(item.id) === id), form, subject, days: dates.size };
+            }).filter(item => item.student && item.days > 3).sort((a, b) => b.days - a.days || a.student.name.localeCompare(b.student.name));
+            document.getElementById("extra-monthly-risk-students").innerHTML = riskStudents.length ? riskStudents.map((item, index) => `<tr><td class="px-4 py-3">${index + 1}</td><td class="px-4 py-3 font-semibold text-slate-900">${escapeReportText(item.student.name)}<div class="text-xs font-normal text-slate-500">${escapeReportText(item.student.class)}</div></td><td class="px-4 py-3">Tingkatan ${escapeReportText(item.form)} — ${escapeReportText(item.subject)}</td><td class="px-4 py-3 text-center font-bold text-rose-600">${item.days}</td></tr>`).join("") : `<tr><td colspan="4" class="px-4 py-8 text-center text-slate-400">Tiada murid melebihi 3 hari tidak hadir kelas tambahan.</td></tr>`;
         }
 
         function printSection(title, headers, rows) {
@@ -1973,9 +2046,11 @@
             const isAdditional = document.getElementById("tab-laporan-tambahan")?.classList.contains("active");
             const selectedMode = isAdditional ? extraReportMode : reportMode;
             const sourceRecords = isAdditional ? db.recordsTambahan : db.recordsHarian;
-            const reportCategories = isAdditional ? db.additionalSubjects : db.classes;
-            const reportStudents = isAdditional ? db.additionalStudents : db.students;
-            const groupLabel = isAdditional ? "Subjek" : "Kelas";
+            const reportCategories = isAdditional
+                ? getAdditionalReportGroups().map(group => `${group.form}\u001f${group.subject}`)
+                : db.classes;
+            const reportStudents = db.students;
+            const groupLabel = isAdditional ? "Tingkatan & Subjek" : "Kelas";
             const reportLabel = isAdditional ? " KELAS TAMBAHAN" : "";
             const fileLabel = isAdditional ? "_Kelas_Tambahan" : "";
             let filename;
@@ -1997,32 +2072,44 @@
                 const attendanceRows = [];
 
                 reportCategories.forEach((className, index) => {
-                    const students = reportStudents.filter(student => student.class === className);
-                    const record = sourceRecords.find(item => item.date === dateValue && item.className === className);
-                    const absentIds = record ? record.absentStudentIds.map(String) : [];
-                    const absentStudents = students.filter(student => absentIds.includes(String(student.id)));
-                    const absent = record ? absentStudents.length : 0;
-                    const present = record ? Math.max(students.length - absent, 0) : 0;
-                    const rate = record && students.length ? (present / students.length) * 100 : null;
-                    if (record) {
+                    const [additionalForm, additionalSubject] = isAdditional ? className.split("\u001f") : ["", ""];
+                    const displayName = isAdditional ? `Tingkatan ${additionalForm} — ${additionalSubject}` : className;
+                    const categoryRecords = sourceRecords.filter(item => item.date === dateValue && (isAdditional
+                        ? item.subject === additionalSubject && getFormLevel(item.className) === additionalForm
+                        : item.className === className));
+                    const students = isAdditional
+                        ? categoryRecords.flatMap(record => {
+                            const excludedIds = (record.excludedStudentIds || []).map(String);
+                            return reportStudents.filter(student => student.class === record.className && !excludedIds.includes(String(student.id)));
+                        })
+                        : reportStudents.filter(student => student.class === className);
+                    const absentStudents = categoryRecords.flatMap(record => {
+                        const absentIds = record.absentStudentIds.map(String);
+                        return reportStudents.filter(student => student.class === record.className && absentIds.includes(String(student.id)));
+                    });
+                    const hasRecord = categoryRecords.length > 0;
+                    const absent = hasRecord ? absentStudents.length : 0;
+                    const present = hasRecord ? Math.max(students.length - absent, 0) : 0;
+                    const rate = hasRecord && students.length ? (present / students.length) * 100 : null;
+                    if (hasRecord) {
                         recordedTotal += students.length;
                         presentTotal += present;
                         absentTotal += absent;
                     }
                     const status = rate == null ? "Belum Hantar" : reportStatus(rate).label;
                     analysisRows.push([
-                        String(index + 1), escapeReportText(className), String(students.length), record ? String(present) : "-",
-                        record ? String(absent) : "-", rate == null ? "-" : `${rate.toFixed(1)}%`, status
+                        String(index + 1), escapeReportText(displayName), String(students.length), hasRecord ? String(present) : "-",
+                        hasRecord ? String(absent) : "-", rate == null ? "-" : `${rate.toFixed(1)}%`, status
                     ]);
                     attendanceRows.push([
-                        String(index + 1), escapeReportText(className),
-                        !record ? "Rekod belum dihantar" : absentStudents.length ? absentStudents.map((student, studentIndex) => `${studentIndex + 1}. ${escapeReportText(student.name)}`).join("<br>") : "Semua murid hadir"
+                        String(index + 1), escapeReportText(displayName),
+                        !hasRecord ? "Rekod belum dihantar" : absentStudents.length ? absentStudents.map((student, studentIndex) => `${studentIndex + 1}. ${escapeReportText(student.name)}${isAdditional ? ` (${escapeReportText(student.class)})` : ""}`).join("<br>") : "Semua murid hadir"
                     ]);
                 });
 
                 const overallRate = recordedTotal ? (presentTotal / recordedTotal) * 100 : 0;
                 content.innerHTML =
-                    printSection("1. Jadual Ringkasan Keseluruhan", ["Jum. Pelajar", "Bil. Hadir", "Bil. Tidak Hadir", "Peratus Kehadiran"], [[String(reportStudents.length), String(presentTotal), String(absentTotal), `${overallRate.toFixed(1)}%`]]) +
+                    printSection("1. Jadual Ringkasan Keseluruhan", ["Jum. Pelajar", "Bil. Hadir", "Bil. Tidak Hadir", "Peratus Kehadiran"], [[String(isAdditional ? recordedTotal : reportStudents.length), String(presentTotal), String(absentTotal), `${overallRate.toFixed(1)}%`]]) +
                     printSection(`2. Jadual Analisis Mengikut ${groupLabel}`, ["Bil", groupLabel, "Jumlah", "Hadir", "TH", "%", "Status"], analysisRows) +
                     printSection(`3. Jadual Senarai Kehadiran Murid Mengikut ${groupLabel}`, ["Bil", groupLabel, "Nama Murid Tidak Hadir"], attendanceRows);
             } else {
@@ -2046,16 +2133,25 @@
                 let totalAbsent = 0;
 
                 reportCategories.forEach((className, index) => {
-                    const students = reportStudents.filter(student => student.class === className);
-                    const classRecords = records.filter(record => record.className === className);
-                    const opportunities = students.length * classRecords.length;
+                    const [additionalForm, additionalSubject] = isAdditional ? className.split("\u001f") : ["", ""];
+                    const displayName = isAdditional ? `Tingkatan ${additionalForm} — ${additionalSubject}` : className;
+                    const classRecords = records.filter(record => isAdditional
+                        ? record.subject === additionalSubject && getFormLevel(record.className) === additionalForm
+                        : record.className === className);
+                    const students = isAdditional
+                        ? classRecords.flatMap(record => {
+                            const excludedIds = (record.excludedStudentIds || []).map(String);
+                            return reportStudents.filter(student => student.class === record.className && !excludedIds.includes(String(student.id)));
+                        })
+                        : reportStudents.filter(student => student.class === className);
+                    const opportunities = isAdditional ? students.length : students.length * classRecords.length;
                     const absent = classRecords.reduce((sum, record) => sum + record.absentStudentIds.length, 0);
                     const present = Math.max(opportunities - absent, 0);
                     const rate = opportunities ? (present / opportunities) * 100 : null;
                     totalOpportunities += opportunities;
                     totalAbsent += absent;
                     classRows.push([
-                        String(index + 1), escapeReportText(className), String(opportunities), String(present), String(absent),
+                        String(index + 1), escapeReportText(displayName), String(opportunities), String(present), String(absent),
                         rate == null ? "-" : `${rate.toFixed(1)}%`, rate == null ? "Tiada Rekod" : reportStatus(rate).label
                     ]);
 
@@ -2066,11 +2162,11 @@
                         absenceCounts[key].add(record.date);
                     }));
                     const absentStudents = Object.entries(absenceCounts)
-                        .map(([id, dates]) => ({ student: students.find(item => String(item.id) === id), days: dates.size }))
+                        .map(([id, dates]) => ({ student: reportStudents.find(item => String(item.id) === id), days: dates.size }))
                         .filter(item => item.student)
                         .sort((a, b) => b.days - a.days || a.student.name.localeCompare(b.student.name));
                     attendanceRows.push([
-                        String(index + 1), escapeReportText(className),
+                        String(index + 1), escapeReportText(displayName),
                         absentStudents.length ? absentStudents.map((item, studentIndex) => `${studentIndex + 1}. ${escapeReportText(item.student.name)} (${item.days} hari TH)`).join("<br>") : classRecords.length ? "Tiada murid tidak hadir" : "Tiada rekod bulan ini"
                     ]);
                 });

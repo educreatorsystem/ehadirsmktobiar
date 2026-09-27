@@ -9,11 +9,14 @@ const ATTENDANCE_HEADERS = [
   "Tarikh",
   "Jenis",
   "Kelas",
+  "Subjek",
   "Jumlah Murid",
   "Bil Hadir",
   "Bil TH",
   "ID Murid TH JSON",
   "Nama Murid TH JSON",
+  "ID Murid TA JSON",
+  "Nama Murid TA JSON",
   "Rekod Key"
 ];
 
@@ -96,26 +99,33 @@ function saveAttendance_(payload) {
 
   const date = cleanText_(payload.date);
   const className = cleanText_(payload.className);
+  const subject = type === "tambahan" ? cleanText_(payload.subject) : "";
   if (!date || !className) throw new Error("Tarikh dan kelas diperlukan.");
+  if (type === "tambahan" && !subject) throw new Error("Subjek diperlukan untuk kelas tambahan.");
 
   const absentStudentIds = normalizeIdArray_(payload.absentStudentIds);
   const absentNames = normalizeTextArray_(payload.absentNames);
+  const excludedStudentIds = normalizeIdArray_(payload.excludedStudentIds);
+  const excludedNames = normalizeTextArray_(payload.excludedNames);
 
   const totalStudents = Number(payload.totalStudents || 0);
   const absentCount = absentStudentIds.length;
-  const presentCount = Math.max(totalStudents - absentCount, 0);
-  const key = makeRecordKey_(type, date, className);
+  const presentCount = Math.max(totalStudents - absentCount - excludedStudentIds.length, 0);
+  const key = makeRecordKey_(type, date, className, subject);
 
   const row = [
     new Date(),
     date,
     type,
     className,
+    subject,
     totalStudents,
     presentCount,
     absentCount,
     JSON.stringify(absentStudentIds),
     JSON.stringify(absentNames),
+    JSON.stringify(excludedStudentIds),
+    JSON.stringify(excludedNames),
     key
   ];
 
@@ -137,11 +147,14 @@ function saveAttendance_(payload) {
     type: type,
     date: date,
     className: className,
+    subject: subject,
     totalStudents: totalStudents,
     presentCount: presentCount,
     absentCount: absentCount,
     absentStudentIds: absentStudentIds,
-    absentNames: absentNames
+    absentNames: absentNames,
+    excludedStudentIds: excludedStudentIds,
+    excludedNames: excludedNames
   };
 }
 
@@ -163,8 +176,11 @@ function replaceAttendanceSheet_(sheetName, type, records) {
     const rows = records.map(function(record) {
       const className = cleanText_(record.className || record.kelas);
       const date = cleanText_(record.date || record.tarikh);
+      const subject = type === "tambahan" ? cleanText_(record.subject || record.subjek) : "";
       const ids = normalizeIdArray_(record.absentStudentIds || record.idsTH);
       const names = normalizeTextArray_(record.absentNames);
+      const excludedIds = normalizeIdArray_(record.excludedStudentIds || record.idsTA);
+      const excludedNames = normalizeTextArray_(record.excludedNames);
       const total = Number(record.totalStudents || 0);
 
       return [
@@ -172,12 +188,15 @@ function replaceAttendanceSheet_(sheetName, type, records) {
         date,
         type,
         className,
+        subject,
         total,
-        Math.max(total - ids.length, 0),
+        Math.max(total - ids.length - excludedIds.length, 0),
         ids.length,
         JSON.stringify(ids),
         JSON.stringify(names),
-        makeRecordKey_(type, date, className)
+        JSON.stringify(excludedIds),
+        JSON.stringify(excludedNames),
+        makeRecordKey_(type, date, className, subject)
       ];
     }).filter(function(row) {
       return row[1] && row[3];
@@ -200,7 +219,9 @@ function readAttendance_(sheetName) {
     return {
       date: formatDateValue_(row[1]),
       className: cleanText_(row[3]),
-      absentStudentIds: parseJsonArray_(row[7]).map(String)
+      subject: cleanText_(row[4]),
+      absentStudentIds: parseJsonArray_(row[8]).map(String),
+      excludedStudentIds: parseJsonArray_(row[10]).map(String)
     };
   }).filter(function(record) {
     return record.date && record.className;
@@ -220,6 +241,14 @@ function ensureAttendanceSheet_(sheetName) {
     sheet.getRange(1, 1, 1, ATTENDANCE_HEADERS.length).setValues([ATTENDANCE_HEADERS]);
     sheet.setFrozenRows(1);
   } else {
+    const currentHeaders = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 10)).getValues()[0];
+    if (currentHeaders[4] === "Jumlah Murid") {
+      sheet.insertColumnAfter(4);
+    }
+    const headersAfterSubject = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 11)).getValues()[0];
+    if (headersAfterSubject[10] === "Rekod Key") {
+      sheet.insertColumnsBefore(11, 2);
+    }
     const headers = sheet.getRange(1, 1, 1, ATTENDANCE_HEADERS.length).getValues()[0];
     if (headers.join("|") !== ATTENDANCE_HEADERS.join("|")) {
       sheet.getRange(1, 1, 1, ATTENDANCE_HEADERS.length).setValues([ATTENDANCE_HEADERS]);
@@ -234,7 +263,7 @@ function findRecordRow_(sheet, key) {
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return -1;
 
-  const keys = sheet.getRange(2, 10, lastRow - 1, 1).getValues();
+  const keys = sheet.getRange(2, 13, lastRow - 1, 1).getValues();
   for (var i = 0; i < keys.length; i++) {
     if (String(keys[i][0]) === key) return i + 2;
   }
@@ -261,8 +290,8 @@ function output_(payload, e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-function makeRecordKey_(type, date, className) {
-  return [type, date, className].join("|");
+function makeRecordKey_(type, date, className, subject) {
+  return [type, date, className, subject || ""].join("|");
 }
 
 function normalizeIdArray_(value) {
