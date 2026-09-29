@@ -88,6 +88,9 @@
                 <button onclick="switchTab('tambahan')" id="nav-tambahan" class="nav-btn flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-blue-100 hover:bg-white/10">
                     <i data-lucide="book-open" class="w-4 h-4"></i> Kelas Tambahan
                 </button>
+                <button onclick="switchTab('analisa-bulanan')" id="nav-analisa-bulanan" class="nav-btn flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-blue-100 hover:bg-white/10">
+                    <i data-lucide="calendar-range" class="w-4 h-4"></i> Analisa Bulanan
+                </button>
                 <button onclick="switchTab('laporan')" id="nav-laporan" class="nav-btn flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-blue-100 hover:bg-white/10">
                     <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Laporan & KPI
                 </button>
@@ -336,6 +339,39 @@
             </div>
         </div>
 
+        <!-- ANALISA BULANAN KELAS HARIAN -->
+        <div id="tab-analisa-bulanan" class="tab-content print-content">
+            <div class="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Analisa Bulanan Kelas Harian</h2>
+                    <p class="mt-1 text-sm text-slate-500">Peratus kehadiran setiap kelas bagi setiap bulan dalam tahun semasa.</p>
+                </div>
+                <div class="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
+                    <div><p class="text-[11px] font-bold uppercase text-slate-400">Tahun Semasa</p><p id="annual-analysis-year" class="text-xl font-extrabold text-blue-800">-</p></div>
+                    <div class="no-print flex items-center gap-2"><button type="button" onclick="renderAnnualMonthlyAnalysis()" title="Muat semula analisa" class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700"><i data-lucide="refresh-cw" class="h-4 w-4"></i></button><button type="button" onclick="printReport(this)" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button></div>
+                </div>
+            </div>
+
+            <div class="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div class="rounded-lg border border-blue-200 bg-blue-50 p-4"><p class="text-xs font-bold uppercase text-blue-700">Purata Keseluruhan</p><p id="annual-overall-rate" class="mt-1 text-2xl font-extrabold text-blue-900">0%</p></div>
+                <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-4"><p class="text-xs font-bold uppercase text-emerald-700">Kelas Terbaik</p><p id="annual-best-class" class="mt-1 text-xl font-extrabold text-emerald-900">-</p><p id="annual-best-class-rate" class="text-xs font-semibold text-emerald-700">0%</p></div>
+                <div class="rounded-lg border border-slate-200 bg-white p-4"><p class="text-xs font-bold uppercase text-slate-500">Jumlah Kelas</p><p id="annual-class-count" class="mt-1 text-2xl font-extrabold text-slate-900">0</p></div>
+            </div>
+
+            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                <div class="flex flex-col gap-2 border-b border-slate-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                    <h3 class="text-sm font-bold uppercase text-slate-700">Jadual Peratus Kehadiran Bulanan</h3>
+                    <div class="flex flex-wrap gap-2 text-[11px] font-bold"><span class="rounded border border-emerald-200 bg-emerald-50 px-2 py-1 text-emerald-700">95–100% Cemerlang</span><span class="rounded border border-blue-200 bg-blue-50 px-2 py-1 text-blue-700">90–94.9% Baik</span><span class="rounded border border-rose-200 bg-rose-50 px-2 py-1 text-rose-700">Bawah 90% Perlu Perhatian</span></div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[1320px] text-left text-sm">
+                        <thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="sticky left-0 z-10 bg-slate-50 px-3 py-3">Bil</th><th class="sticky left-10 z-10 min-w-[150px] bg-slate-50 px-3 py-3">Kelas</th><th class="px-3 py-3 text-center">Jan</th><th class="px-3 py-3 text-center">Feb</th><th class="px-3 py-3 text-center">Mac</th><th class="px-3 py-3 text-center">Apr</th><th class="px-3 py-3 text-center">Mei</th><th class="px-3 py-3 text-center">Jun</th><th class="px-3 py-3 text-center">Jul</th><th class="px-3 py-3 text-center">Ogos</th><th class="px-3 py-3 text-center">Sep</th><th class="px-3 py-3 text-center">Okt</th><th class="px-3 py-3 text-center">Nov</th><th class="px-3 py-3 text-center">Dis</th><th class="px-3 py-3 text-center">Purata Tahun</th></tr></thead>
+                        <tbody id="annual-monthly-analysis-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- LAPORAN & KPI BAHARU -->
         <div id="tab-laporan" class="tab-content">
             <div class="flex flex-col gap-4 border-b border-slate-200 pb-5 mb-6 sm:flex-row sm:items-end sm:justify-between">
@@ -353,15 +389,15 @@
                 </div>
             </div>
 
-            <section id="report-view-harian">
+            <section id="report-view-harian" class="print-content">
                 <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <label for="report-daily-date" class="mb-1 block text-xs font-bold uppercase text-slate-500">Tarikh Laporan</label>
                         <input id="report-daily-date" type="date" onchange="renderDailyReport()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <div class="flex flex-wrap gap-2">
+                    <div class="no-print flex flex-wrap gap-2">
                         <button type="button" onclick="renderDailyReport()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"><i data-lucide="refresh-cw" class="h-4 w-4"></i> Jana Laporan</button>
-                        <button type="button" onclick="printOfficialReport()" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button>
+                        <button type="button" onclick="printReport(this)" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button>
                         <button type="button" onclick="generateOfficialPdf()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"><i data-lucide="file-down" class="h-4 w-4"></i> Jana PDF</button>
                     </div>
                 </div>
@@ -390,15 +426,15 @@
                 </div>
             </section>
 
-            <section id="report-view-bulanan" class="hidden">
+            <section id="report-view-bulanan" class="print-content hidden">
                 <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div class="flex flex-col gap-3 sm:flex-row">
                         <div><label for="report-month" class="mb-1 block text-xs font-bold uppercase text-slate-500">Bulan</label><select id="report-month" onchange="renderMonthlyReport()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"></select></div>
                         <div><label for="report-year" class="mb-1 block text-xs font-bold uppercase text-slate-500">Tahun</label><select id="report-year" onchange="renderMonthlyReport()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"></select></div>
                     </div>
-                    <div class="flex flex-wrap gap-2">
+                    <div class="no-print flex flex-wrap gap-2">
                         <button type="button" onclick="renderMonthlyReport()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"><i data-lucide="refresh-cw" class="h-4 w-4"></i> Jana Laporan</button>
-                        <button type="button" onclick="printOfficialReport()" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button>
+                        <button type="button" onclick="printReport(this)" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button>
                         <button type="button" onclick="generateOfficialPdf()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"><i data-lucide="file-down" class="h-4 w-4"></i> Jana PDF</button>
                     </div>
                 </div>
@@ -425,12 +461,12 @@
                 </div>
             </div>
 
-            <section id="extra-report-view-harian">
+            <section id="extra-report-view-harian" class="print-content">
                 <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div><label for="extra-report-daily-date" class="mb-1 block text-xs font-bold uppercase text-slate-500">Tarikh Laporan</label><input id="extra-report-daily-date" type="date" onchange="renderExtraDailyReport()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500"></div>
-                    <div class="flex flex-wrap gap-2">
+                    <div class="no-print flex flex-wrap gap-2">
                         <button type="button" onclick="renderExtraDailyReport()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"><i data-lucide="refresh-cw" class="h-4 w-4"></i> Jana Laporan</button>
-                        <button type="button" onclick="printOfficialReport()" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button>
+                        <button type="button" onclick="printReport(this)" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button>
                         <button type="button" onclick="generateOfficialPdf()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"><i data-lucide="file-down" class="h-4 w-4"></i> Jana PDF</button>
                     </div>
                 </div>
@@ -445,10 +481,10 @@
                 <div><h3 class="mb-3 text-sm font-bold uppercase text-slate-700">Senarai Kehadiran Mengikut Subjek dan Tingkatan</h3><div id="extra-daily-absent-by-class" class="grid grid-cols-1 gap-3 md:grid-cols-2"></div></div>
             </section>
 
-            <section id="extra-report-view-bulanan" class="hidden">
+            <section id="extra-report-view-bulanan" class="print-content hidden">
                 <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div class="flex flex-col gap-3 sm:flex-row"><div><label for="extra-report-month" class="mb-1 block text-xs font-bold uppercase text-slate-500">Bulan</label><select id="extra-report-month" onchange="renderExtraMonthlyReport()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"></select></div><div><label for="extra-report-year" class="mb-1 block text-xs font-bold uppercase text-slate-500">Tahun</label><select id="extra-report-year" onchange="renderExtraMonthlyReport()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700"></select></div></div>
-                    <div class="flex flex-wrap gap-2"><button type="button" onclick="renderExtraMonthlyReport()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"><i data-lucide="refresh-cw" class="h-4 w-4"></i> Jana Laporan</button><button type="button" onclick="printOfficialReport()" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button><button type="button" onclick="generateOfficialPdf()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"><i data-lucide="file-down" class="h-4 w-4"></i> Jana PDF</button></div>
+                    <div class="no-print flex flex-wrap gap-2"><button type="button" onclick="renderExtraMonthlyReport()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"><i data-lucide="refresh-cw" class="h-4 w-4"></i> Jana Laporan</button><button type="button" onclick="printReport(this)" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><i data-lucide="printer" class="h-4 w-4"></i> Cetak</button><button type="button" onclick="generateOfficialPdf()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"><i data-lucide="file-down" class="h-4 w-4"></i> Jana PDF</button></div>
                 </div>
                 <div class="mb-7 grid grid-cols-1 gap-3 sm:grid-cols-2"><div class="rounded-lg border border-indigo-200 bg-indigo-50 p-5"><p class="text-xs font-bold uppercase text-indigo-700">Kadar Kehadiran Keseluruhan</p><p id="extra-monthly-overall-rate" class="mt-2 text-3xl font-extrabold text-indigo-800">0%</p><p id="extra-monthly-record-summary" class="mt-1 text-xs text-indigo-700">Tiada rekod</p></div><div class="rounded-lg border border-emerald-200 bg-emerald-50 p-5"><p class="text-xs font-bold uppercase text-emerald-700">Subjek dan Tingkatan Terbaik</p><p id="extra-monthly-top-class" class="mt-2 text-2xl font-extrabold text-emerald-800">-</p><p id="extra-monthly-top-class-rate" class="mt-1 text-xs text-emerald-700">0% kehadiran</p></div></div>
                 <div class="mb-7 overflow-hidden rounded-lg border border-slate-200 bg-white"><div class="border-b border-slate-200 px-4 py-3"><h3 class="text-sm font-bold uppercase text-slate-700">Analisis Bulanan Mengikut Subjek dan Tingkatan</h3></div><div class="overflow-x-auto"><table class="w-full min-w-[760px] text-left text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Bil</th><th class="px-4 py-3">Tingkatan</th><th class="px-4 py-3">Subjek</th><th class="px-4 py-3 text-center">Peluang</th><th class="px-4 py-3 text-center">Hadir</th><th class="px-4 py-3 text-center">TH</th><th class="px-4 py-3 text-center">%</th></tr></thead><tbody id="extra-monthly-group-analysis" class="divide-y divide-slate-100"></tbody></table></div></div>
@@ -849,7 +885,7 @@
         <div class="print-footer">Dijana melalui Sistem e-HADIR SMK Tobiar</div>
     </div>
 
-    <div id="print-container" class="hidden">
+    <div id="print-container" class="print-content hidden">
         <div class="text-center border-b-2 border-slate-800 pb-4 mb-4">
             <h2 class="text-xl font-bold uppercase tracking-wide">SEKOLAH MENENGAH KEBANGSAAN TOBIAR</h2>
             <p class="text-xs">06700 PENDANG, KEDAH DARUL AMAN</p>
@@ -1366,6 +1402,8 @@
 
             if (tabName === 'status') {
                 renderClassSubmissionStatus();
+            } else if (tabName === 'analisa-bulanan') {
+                renderAnnualMonthlyAnalysis();
             } else if (tabName === 'laporan') {
                 generateReport();
             } else if (tabName === 'laporan-tambahan') {
@@ -1929,6 +1967,64 @@
             }).join("");
         }
 
+        function annualRateCell(rate) {
+            if (rate == null) return `<span class="text-slate-300">–</span>`;
+            const classes = rate >= 95
+                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                : rate >= 90
+                    ? "border-blue-200 bg-blue-50 text-blue-700"
+                    : "border-rose-200 bg-rose-50 text-rose-700";
+            return `<span class="inline-flex min-w-[58px] justify-center rounded border px-2 py-1 text-xs font-bold ${classes}">${rate.toFixed(1)}%</span>`;
+        }
+
+        function renderAnnualMonthlyAnalysis() {
+            const year = new Date().getFullYear();
+            const yearLabel = document.getElementById("annual-analysis-year");
+            const body = document.getElementById("annual-monthly-analysis-body");
+            if (!body) return;
+            if (yearLabel) yearLabel.textContent = String(year);
+
+            let overallOpportunities = 0;
+            let overallAbsent = 0;
+            const rows = db.classes.map((className, index) => {
+                const studentCount = db.students.filter(student => student.class === className).length;
+                let annualOpportunities = 0;
+                let annualAbsent = 0;
+                const monthlyRates = Array.from({ length: 12 }, (_, monthIndex) => {
+                    const monthRecords = db.recordsHarian.filter(record => {
+                        const [recordYear, recordMonth] = String(record.date).split("-").map(Number);
+                        return record.className === className && recordYear === year && recordMonth === monthIndex + 1;
+                    });
+                    if (!monthRecords.length || !studentCount) return null;
+                    const opportunities = studentCount * monthRecords.length;
+                    const absent = monthRecords.reduce((sum, record) => sum + record.absentStudentIds.length, 0);
+                    annualOpportunities += opportunities;
+                    annualAbsent += absent;
+                    return ((opportunities - absent) / opportunities) * 100;
+                });
+                overallOpportunities += annualOpportunities;
+                overallAbsent += annualAbsent;
+                const annualRate = annualOpportunities ? ((annualOpportunities - annualAbsent) / annualOpportunities) * 100 : null;
+                return { index, className, monthlyRates, annualRate, annualOpportunities };
+            });
+
+            body.innerHTML = rows.map(item => `<tr class="text-slate-700">
+                <td class="sticky left-0 z-[1] bg-white px-3 py-3">${item.index + 1}</td>
+                <td class="sticky left-10 z-[1] bg-white px-3 py-3 font-bold text-slate-900">${escapeReportText(item.className)}</td>
+                ${item.monthlyRates.map(rate => `<td class="px-3 py-3 text-center">${annualRateCell(rate)}</td>`).join("")}
+                <td class="bg-slate-50 px-3 py-3 text-center">${annualRateCell(item.annualRate)}</td>
+            </tr>`).join("") || `<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">Tiada kelas dalam senarai murid.</td></tr>`;
+
+            const overallRate = overallOpportunities ? ((overallOpportunities - overallAbsent) / overallOpportunities) * 100 : 0;
+            const ranked = rows.filter(item => item.annualRate != null).sort((a, b) => b.annualRate - a.annualRate || a.className.localeCompare(b.className));
+            const best = ranked[0];
+            document.getElementById("annual-overall-rate").textContent = `${overallRate.toFixed(1)}%`;
+            document.getElementById("annual-best-class").textContent = best ? best.className : "-";
+            document.getElementById("annual-best-class-rate").textContent = best ? `${best.annualRate.toFixed(1)}% purata tahunan` : "Tiada rekod tahun ini";
+            document.getElementById("annual-class-count").textContent = db.classes.length;
+            lucide.createIcons();
+        }
+
         function renderMonthlyReport() {
             const month = Number(document.getElementById("report-month")?.value ?? new Date().getMonth());
             const year = Number(document.getElementById("report-year")?.value ?? new Date().getFullYear());
@@ -2182,9 +2278,106 @@
             return filename;
         }
 
+        function printReport(trigger) {
+            const source = trigger?.closest?.(".print-content")
+                || document.querySelector(".tab-content.active.print-content")
+                || document.querySelector(".tab-content.active .print-content:not(.hidden)");
+            if (!source) {
+                Swal.fire("Ralat", "Kandungan laporan untuk dicetak tidak ditemui.", "error");
+                return;
+            }
+
+            const printable = source.cloneNode(true);
+            printable.classList.remove("hidden", "tab-content");
+            printable.querySelectorAll(".no-print, button, input, select, script").forEach(element => element.remove());
+            printable.querySelectorAll(".hidden").forEach(element => element.classList.remove("hidden"));
+
+            const logoUrl = new URL("logo-smk-tobiar.png", window.location.href).href;
+            printable.insertAdjacentHTML("afterbegin", `
+                <header class="print-school-header text-center mb-4">
+                    <img src="${logoUrl}" alt="Lencana SMK Tobiar">
+                    <div>
+                        <p class="school-name">SEKOLAH MENENGAH KEBANGSAAN TOBIAR</p>
+                        <p class="report-name">LAPORAN SISTEM e-HADIR</p>
+                    </div>
+                </header>
+            `);
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                Swal.fire("Popup Disekat", "Benarkan popup untuk menggunakan fungsi cetak.", "warning");
+                return;
+            }
+
+            printWindow.document.write(`<!DOCTYPE html>
+                <html lang="ms">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Cetakan Laporan e-Hadir SMK Tobiar</title>
+                    <style>
+                        @page { size: A4 portrait; margin: 0; }
+                        * { box-sizing: border-box; }
+                        html, body { margin: 0; padding: 0; background: #fff; color: #172033; font-family: Arial, Helvetica, sans-serif; }
+                        body { display: flex; justify-content: center; }
+                        .print-content { width:210mm; min-height:297mm; padding: 12mm; background: #fff; }
+                        .print-school-header { display: flex; align-items: center; justify-content: center; gap: 12px; border-bottom: 2px solid #172554; padding-bottom: 10px; }
+                        .print-school-header img { width: 18mm; height: 18mm; object-fit: contain; }
+                        .school-name { margin: 0 0 3px; font-size: 15px; font-weight: 800; color: #172554; }
+                        .report-name { margin: 0; font-size: 11px; font-weight: 700; color: #475569; }
+                        h1, h2, h3, h4, p { margin-top: 0; }
+                        h2 { margin-bottom: 4px; font-size: 19px; color: #172554; }
+                        h3 { margin-bottom: 8px; font-size: 12px; }
+                        p { font-size: 10px; line-height: 1.45; }
+                        table { width: 100%; border-collapse: collapse; table-layout: auto; margin-top: 8px; font-size: 8px; }
+                        th, td { border: 1px solid #94a3b8; padding: 5px 4px; vertical-align: top; }
+                        th { background: #e2e8f0; color: #1e293b; font-weight: 800; text-transform: uppercase; }
+                        tr { break-inside: avoid; page-break-inside: avoid; }
+                        section, .rounded-lg, .rounded-xl { break-inside: avoid; page-break-inside: avoid; }
+                        .grid { display: grid; gap: 8px; }
+                        .grid-cols-1 { grid-template-columns: 1fr; }
+                        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+                        .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+                        .mb-3 { margin-bottom: 8px; }
+                        .mb-4 { margin-bottom: 12px; }
+                        .mb-5, .mb-6, .mb-7 { margin-bottom: 14px; }
+                        .mt-1, .mt-2 { margin-top: 4px; }
+                        .p-4, .p-5 { padding: 9px; }
+                        .px-4 { padding-left: 8px; padding-right: 8px; }
+                        .py-3 { padding-top: 6px; padding-bottom: 6px; }
+                        .text-center { text-align: center; }
+                        .text-right { text-align: right; }
+                        .font-bold, .font-extrabold { font-weight: 800; }
+                        .text-2xl, .text-3xl { font-size: 18px; }
+                        .rounded-lg, .rounded-xl { border: 1px solid #cbd5e1; border-radius: 4px; }
+                        .border { border: 1px solid #cbd5e1; }
+                        .bg-blue-50, .bg-indigo-50, .bg-emerald-50, .bg-rose-50, .bg-slate-50 { background: #f8fafc; }
+                        .overflow-x-auto { overflow: visible; }
+                        .sticky { position: static; }
+                        .no-print { display: none !important; }
+                        @media screen and (max-width: 800px) {
+                            .print-content { width: 100%; min-height: auto; padding: 16px; }
+                            .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr; }
+                        }
+                        @media print {
+                            html, body { width: 210mm; min-height: 297mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+                            body { display: block; }
+                            .print-content { width: 210mm; min-height: 297mm; margin: 0; padding: 12mm; box-shadow: none; }
+                            .no-print { display: none !important; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <main class="print-content">${printable.innerHTML}</main>
+                </body>
+                </html>`);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
         function printOfficialReport() {
-            prepareOfficialReport();
-            window.print();
+            printReport();
         }
 
         async function generateOfficialPdf() {
@@ -2511,8 +2704,7 @@
                 });
             }
 
-            // Trigger window print
-            window.print();
+            printReport(document.getElementById("print-container"));
         }
 
         function renderAdminLists() {
