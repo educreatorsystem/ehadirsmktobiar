@@ -986,6 +986,30 @@
             lastCloudSync: null
         };
         let statusAttendanceType = "harian";
+        const pendingAttendanceRecords = new Map();
+
+        function attendanceRecordKey(type, record) {
+            return [type, record.date || "", record.className || "", type === "tambahan" ? (record.subject || "") : ""].join("|");
+        }
+
+        function mergeCloudRecords(cloudRecords, localRecords, type) {
+            const now = Date.now();
+            const cloudMap = new Map(cloudRecords.map(record => [attendanceRecordKey(type, record), record]));
+
+            localRecords.forEach(record => {
+                const key = attendanceRecordKey(type, record);
+                const pendingUntil = pendingAttendanceRecords.get(key) || 0;
+                if (cloudMap.has(key)) {
+                    pendingAttendanceRecords.delete(key);
+                } else if (pendingUntil > now) {
+                    cloudMap.set(key, record);
+                } else if (pendingUntil) {
+                    pendingAttendanceRecords.delete(key);
+                }
+            });
+
+            return [...cloudMap.values()];
+        }
 
         document.addEventListener("DOMContentLoaded", async () => {
             loadFromLocalStorage();
@@ -1204,8 +1228,10 @@
         }
 
         function applyCloudData(data) {
-            db.recordsHarian = normalizeRecords(data.recordsHarian || []);
-            db.recordsTambahan = normalizeRecords(data.recordsTambahan || []);
+            const cloudHarian = normalizeRecords(data.recordsHarian || []);
+            const cloudTambahan = normalizeRecords(data.recordsTambahan || []);
+            db.recordsHarian = mergeCloudRecords(cloudHarian, db.recordsHarian, "harian");
+            db.recordsTambahan = mergeCloudRecords(cloudTambahan, db.recordsTambahan, "tambahan");
             db.lastCloudSync = new Date().toISOString();
             saveToLocalStorage();
             populateDropdowns();
@@ -1567,6 +1593,7 @@
 
             const recordsList = type === 'harian' ? db.recordsHarian : db.recordsTambahan;
             const existingIdx = recordsList.findIndex(r => r.date === dateVal && r.className === className && (type !== "tambahan" || r.subject === subject));
+            const previousRecord = existingIdx >= 0 ? JSON.parse(JSON.stringify(recordsList[existingIdx])) : null;
 
             if (existingIdx >= 0) {
                 recordsList[existingIdx].absentStudentIds = absentStudentIds;
@@ -1608,10 +1635,21 @@
             const res = await postToGoogleSheets(payload);
 
             if (res.success) {
+                const savedRecord = recordsList.find(r => r.date === dateVal && r.className === className && (type !== "tambahan" || r.subject === subject));
+                pendingAttendanceRecords.set(attendanceRecordKey(type, savedRecord), Date.now() + 60000);
+                renderClassSubmissionStatus();
                 Swal.close();
                 setTimeout(() => fetchFromCloud({ silent: true }).catch(() => null), 1500);
                 showNotepadModal(type, className, dateVal, classStudents.length, absentNames, subject);
             } else {
+                if (previousRecord) {
+                    recordsList[existingIdx] = previousRecord;
+                } else {
+                    const newRecordIdx = recordsList.findIndex(r => r.date === dateVal && r.className === className && (type !== "tambahan" || r.subject === subject));
+                    if (newRecordIdx >= 0) recordsList.splice(newRecordIdx, 1);
+                }
+                saveToLocalStorage();
+                renderClassSubmissionStatus();
                 Swal.fire({
                     icon: 'error',
                     title: 'Rekod Belum Disimpan',
@@ -1689,8 +1727,7 @@
         }
 
         function renderClassSubmissionStatus() {
-            const dateInputId = statusAttendanceType === "tambahan" ? "date-tambahan" : "date-harian";
-            const targetDate = document.getElementById(dateInputId)?.value || new Date().toISOString().split('T')[0];
+            const targetDate = localDateValue();
             const dateDisplay = document.getElementById("status-today-date-display");
             if (dateDisplay) {
                 dateDisplay.textContent = targetDate;
