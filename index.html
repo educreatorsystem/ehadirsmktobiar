@@ -2023,6 +2023,8 @@
 
             let overallOpportunities = 0;
             let overallAbsent = 0;
+            const monthlyOpportunities = Array(12).fill(0);
+            const monthlyAbsent = Array(12).fill(0);
             const rows = db.classes.map((className, index) => {
                 const studentCount = db.students.filter(student => student.class === className).length;
                 let annualOpportunities = 0;
@@ -2037,6 +2039,8 @@
                     const absent = monthRecords.reduce((sum, record) => sum + record.absentStudentIds.length, 0);
                     annualOpportunities += opportunities;
                     annualAbsent += absent;
+                    monthlyOpportunities[monthIndex] += opportunities;
+                    monthlyAbsent[monthIndex] += absent;
                     return ((opportunities - absent) / opportunities) * 100;
                 });
                 overallOpportunities += annualOpportunities;
@@ -2045,14 +2049,27 @@
                 return { index, className, monthlyRates, annualRate, annualOpportunities };
             });
 
-            body.innerHTML = rows.map(item => `<tr class="text-slate-700">
+            const classRowsHtml = rows.map(item => `<tr class="text-slate-700">
                 <td class="sticky left-0 z-[1] bg-white px-3 py-3">${item.index + 1}</td>
                 <td class="sticky left-10 z-[1] bg-white px-3 py-3 font-bold text-slate-900">${escapeReportText(item.className)}</td>
                 ${item.monthlyRates.map(rate => `<td class="px-3 py-3 text-center">${annualRateCell(rate)}</td>`).join("")}
                 <td class="bg-slate-50 px-3 py-3 text-center">${annualRateCell(item.annualRate)}</td>
-            </tr>`).join("") || `<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">Tiada kelas dalam senarai murid.</td></tr>`;
+            </tr>`).join("");
 
-            const overallRate = overallOpportunities ? ((overallOpportunities - overallAbsent) / overallOpportunities) * 100 : 0;
+            const monthlyOverallRates = monthlyOpportunities.map((opportunities, monthIndex) => opportunities
+                ? ((opportunities - monthlyAbsent[monthIndex]) / opportunities) * 100
+                : null);
+            const overallRateValue = overallOpportunities ? ((overallOpportunities - overallAbsent) / overallOpportunities) * 100 : null;
+            const overallRowHtml = `<tr class="border-t-2 border-blue-800 bg-blue-50 text-blue-950">
+                <td class="sticky left-0 z-[1] bg-blue-50 px-3 py-4 text-center font-extrabold" colspan="2">PURATA SEMUA KELAS</td>
+                ${monthlyOverallRates.map(rate => `<td class="px-3 py-4 text-center">${annualRateCell(rate)}</td>`).join("")}
+                <td class="bg-blue-100 px-3 py-4 text-center">${annualRateCell(overallRateValue)}</td>
+            </tr>`;
+            body.innerHTML = rows.length
+                ? classRowsHtml + overallRowHtml
+                : `<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">Tiada kelas dalam senarai murid.</td></tr>`;
+
+            const overallRate = overallRateValue || 0;
             const ranked = rows.filter(item => item.annualRate != null).sort((a, b) => b.annualRate - a.annualRate || a.className.localeCompare(b.className));
             const best = ranked[0];
             document.getElementById("annual-overall-rate").textContent = `${overallRate.toFixed(1)}%`;
