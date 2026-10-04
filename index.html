@@ -117,9 +117,14 @@
                             <p id="status-type-description" class="text-xs text-slate-500">Pemantauan hantaran Kelas Harian mengikut kelas secara masa nyata</p>
                         </div>
                     </div>
-                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 rounded-lg text-xs font-semibold text-slate-700 self-start sm:self-auto">
-                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600"></i>
-                        <span id="status-today-date-display">-</span>
+                    <div class="flex items-center gap-2 self-start sm:self-auto">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 rounded-lg text-xs font-semibold text-slate-700">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600"></i>
+                            <span id="status-today-date-display">-</span>
+                        </div>
+                        <button id="status-refresh-button" type="button" onclick="refreshStatusNow(this)" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60" title="Tarik data terkini daripada Google Sheet">
+                            <i data-lucide="refresh-cw" class="h-3.5 w-3.5"></i><span class="hidden sm:inline">Segar Semula</span>
+                        </button>
                     </div>
                 </div>
 
@@ -987,6 +992,8 @@
         };
         let statusAttendanceType = "harian";
         const pendingAttendanceRecords = new Map();
+        let cloudFetchInProgress = false;
+        let statusAutoRefreshStarted = false;
 
         function attendanceRecordKey(type, record) {
             return [type, record.date || "", record.className || "", type === "tambahan" ? (record.subject || "") : ""].join("|");
@@ -1023,6 +1030,7 @@
             updateGasUrlUI();
             lucide.createIcons();
             await bootstrapCloudData();
+            startStatusAutoRefresh();
         });
 
         function loadFromLocalStorage() {
@@ -1088,6 +1096,7 @@
                 const url = new URL(db.gasUrl);
                 url.searchParams.set("action", action);
                 url.searchParams.set("callback", callbackName);
+                url.searchParams.set("_ts", String(Date.now()));
                 Object.entries(params).forEach(([key, value]) => {
                     if (value !== undefined && value !== null) url.searchParams.set(key, value);
                 });
@@ -1271,13 +1280,15 @@
             if (!db.gasUrl) return { success: false, message: "URL Google Apps Script tidak ditetapkan" };
             try {
                 if (payload.action === "submitAttendance") {
-                    const result = await callAppsScript("submitAttendance", {
-                        payload: JSON.stringify(payload)
+                    await fetch(db.gasUrl, {
+                        method: "POST",
+                        mode: "no-cors",
+                        cache: "no-store",
+                        keepalive: true,
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ ...payload, timestamp: new Date().toISOString() })
                     });
-                    if (!result || result.status !== "success") {
-                        throw new Error(result && result.message ? result.message : "Apps Script tidak mengesahkan penyimpanan rekod.");
-                    }
-                    return { success: true, data: result.saved };
+                    return { success: true, pendingVerification: true };
                 }
 
                 await fetch(db.gasUrl, {
@@ -1318,6 +1329,8 @@
         }
 
         async function fetchFromCloud(options = {}) {
+            if (cloudFetchInProgress) return false;
+            cloudFetchInProgress = true;
             if (!options.silent) {
                 Swal.fire({
                     title: 'Memuat Turun Data...',
@@ -1342,6 +1355,37 @@
                 setConnectionStatus("online", "Roster CSV Aktif");
                 if (!options.silent) Swal.fire('Roster CSV Aktif', 'Nama kelas dan murid telah dibaca terus daripada URL CSV. Rekod kehadiran Cloud belum dapat dimuat turun; pastikan Code.gs terkini telah dideploy.', 'info');
                 throw e;
+            } finally {
+                cloudFetchInProgress = false;
+            }
+        }
+
+        function refreshStatusFromCloud() {
+            const statusTabActive = document.getElementById("tab-status")?.classList.contains("active");
+            if (!statusTabActive || document.hidden) return;
+            fetchFromCloud({ silent: true }).catch(error => console.warn("Status belum dapat disegerakkan.", error));
+        }
+
+        function startStatusAutoRefresh() {
+            if (statusAutoRefreshStarted) return;
+            statusAutoRefreshStarted = true;
+            window.setInterval(refreshStatusFromCloud, 20000);
+            window.addEventListener("focus", refreshStatusFromCloud);
+            document.addEventListener("visibilitychange", () => {
+                if (!document.hidden) refreshStatusFromCloud();
+            });
+        }
+
+        async function refreshStatusNow(button) {
+            if (button) button.disabled = true;
+            try {
+                await fetchFromCloud({ silent: true });
+                renderClassSubmissionStatus();
+                Swal.fire({ toast: true, position: "top-end", icon: "success", title: "Status telah dikemas kini", showConfirmButton: false, timer: 1600 });
+            } catch (error) {
+                Swal.fire({ toast: true, position: "top-end", icon: "warning", title: "Status belum dapat disegerakkan", showConfirmButton: false, timer: 2200 });
+            } finally {
+                if (button) button.disabled = false;
             }
         }
 
@@ -1428,6 +1472,7 @@
 
             if (tabName === 'status') {
                 renderClassSubmissionStatus();
+                fetchFromCloud({ silent: true }).catch(() => null);
             } else if (tabName === 'analisa-bulanan') {
                 renderAnnualMonthlyAnalysis();
             } else if (tabName === 'laporan') {
@@ -1639,7 +1684,8 @@
                 pendingAttendanceRecords.set(attendanceRecordKey(type, savedRecord), Date.now() + 60000);
                 renderClassSubmissionStatus();
                 Swal.close();
-                setTimeout(() => fetchFromCloud({ silent: true }).catch(() => null), 1500);
+                setTimeout(() => fetchFromCloud({ silent: true }).catch(() => null), 2500);
+                setTimeout(() => fetchFromCloud({ silent: true }).catch(() => null), 7000);
                 showNotepadModal(type, className, dateVal, classStudents.length, absentNames, subject);
             } else {
                 if (previousRecord) {
